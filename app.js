@@ -25,8 +25,8 @@ const RETRYABLE_STATUS = Object.freeze([408, 429, 502, 503, 504]);
 // Roles: 0 = jugador, 1 = admin
 const ROLES = Object.freeze({ PLAYER: 0, ADMIN: 1 });
 const ROLE_BADGES = Object.freeze({
-    [ROLES.PLAYER]: { text: "USER", className: "" },
-    [ROLES.ADMIN]:  { text: "ADMIN", className: "admin" }
+    [ROLES.PLAYER]: { text: "Usuario", className: "" },
+    [ROLES.ADMIN]:  { text: "Administrador", className: "admin" }
 });
 
 // Tipos de operación de la cola
@@ -50,7 +50,6 @@ const CONFIG = Object.freeze({
 /* ==========================================================
    2. MENSAJES
    Todos los textos visibles al usuario, centralizados.
-   Se ELIMINARON searchNeedsId y searchNotFound (ya no hay "buscar por id").
    ========================================================== */
 const MESSAGES = Object.freeze({
     // Conexión
@@ -187,7 +186,6 @@ const UserModel = {
 
 /* ==========================================================
    5. SERVICIO DE API
-   Se ELIMINÓ getById (ya no se busca por id contra el server).
    ========================================================== */
 const UserService = {
     // Petición maestra con timeout y clasificación de errores
@@ -376,7 +374,6 @@ const Sync = {
 
 /* ==========================================================
    8. ESTADO
-   Se ELIMINÓ searchResult (ya no hay búsqueda por id contra API).
    ========================================================== */
 const state = {
     users: [],
@@ -393,7 +390,6 @@ const UI = {
     formFields: ["name", "userName", "password"],
 
     init() {
-        // Se ELIMINÓ "btnSearchId" del array
         [
             "netPill", "netText", "offlineBanner", "btnInstall", "btnSync",
             "userForm", "userId", "name", "userName", "password", "rol", "formMsg",
@@ -579,7 +575,6 @@ const UI = {
 
 /* ==========================================================
    10. CONTROLADOR
-   Se ELIMINÓ searchById y el listener del botón.
    ========================================================== */
 const Controller = {
     isOnline: () => navigator.onLine,
