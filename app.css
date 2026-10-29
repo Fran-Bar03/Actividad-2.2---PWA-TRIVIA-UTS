@@ -1,0 +1,500 @@
+/* ==========================================================
+   1. VARIABLES
+   Toda la paleta y medidas centralizadas. Cambiar el tema
+   = tocar solo este bloque.
+   ========================================================== */
+:root{
+    /* Fondos */
+    --bg: #0a2f23;
+    --bg-2: #0d3b2c;
+
+    /* Tarjetas (3 intensidades) */
+    --card: #12503a;
+    --card-2: #166149;
+    --card-hover: #1b7356;
+
+    /* Líneas/bordes */
+    --line: #2a7c5b;
+
+    /* Textos */
+    --text: #e9f6ef;
+    --muted: #9ccbb5;
+
+    /* Acentos de marca */
+    --purple: #8e72d8;
+    --purple-dark: #7459c2;
+    --orange: #e9892c;
+
+    /* Rol "user" (verde). Admin usa --orange. */
+    --user: #1f9a6c;
+
+    /* Colores semánticos */
+    --danger: #ff6b6b;
+    --success: #3ddc97;
+    --warning: #ffb74d;
+    --info: #7aa7ff;
+    --offline: #b3261e;
+
+    /* Medidas */
+    --radius: 16px;
+    --header-height: 70px;
+}
+
+/* ==========================================================
+   2. BASE
+   ========================================================== */
+
+/* border-box → padding/border no suman al ancho declarado */
+*{ box-sizing: border-box; }
+
+/* [hidden] siempre oculta, aunque otra regla ponga display: flex/block */
+[hidden]{ display: none !important; }
+
+/* Evita zoom automático al rotar en iOS */
+html{ -webkit-text-size-adjust: 100%; }
+
+body{
+    margin: 0;
+    min-height: 100vh;
+    /* Fondo radial verde anclado al viewport */
+    background: radial-gradient(1200px 600px at 10% -10%, #14614a 0%, var(--bg) 55%) fixed;
+    color: var(--text);
+    font-family: "Segoe UI", "Trebuchet MS", Arial, sans-serif;
+    line-height: 1.4;
+}
+
+h1, h2, h3{ margin: 0; }
+
+label{
+    display: block;
+    margin: 12px 0 6px;
+    font-size: 14px;
+    color: var(--muted);
+}
+
+/* Estilo común para inputs y selects */
+input, select{
+    width: 100%;
+    padding: 13px 16px;
+    background: var(--bg-2);
+    color: var(--text);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    font-size: 16px;         /* 16px evita zoom automático en iOS */
+    font-family: inherit;
+}
+input::placeholder{ color: #78a891; }
+
+/* Marca de campo con error (la activa JS con aria-invalid="true") */
+input[aria-invalid="true"]{
+    border-color: var(--danger);
+    box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2);
+}
+
+/* Anillo de foco visible para accesibilidad con teclado */
+input:focus-visible, select:focus-visible, .btn:focus-visible, tbody tr:focus-visible{
+    outline: 3px solid var(--purple);
+    outline-offset: 2px;
+}
+
+/* Texto secundario */
+.muted{ margin: 0; color: var(--muted); font-size: 14px; }
+
+/* ==========================================================
+   3. ENCABEZADO, ESTADO DE CONEXIÓN Y AVISO OFFLINE
+   ========================================================== */
+
+/* Barra superior fija con "vidrio esmerilado" */
+.topbar{
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: var(--header-height);
+    padding: 12px clamp(16px, 4vw, 40px); /* padding fluido */
+    background: rgba(10, 47, 35, 0.92);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--line);
+}
+
+.brand{ display: flex; align-items: center; gap: 12px; min-width: 0; }
+.brand img{ border-radius: 12px; }
+.brand h1{ font-size: clamp(18px, 3vw, 24px); }
+.brand p{ margin: 2px 0 0; font-size: 14px; color: var(--muted); }
+
+.topbar-actions{ display: flex; align-items: center; gap: 12px; }
+
+/* Píldora de conexión (verde online / roja offline) */
+.net-pill{
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: rgba(61, 220, 151, 0.12);
+    border: 1px solid rgba(61, 220, 151, 0.35);
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.net-dot{
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--success);
+    box-shadow: 0 0 0 3px rgba(61, 220, 151, 0.25);
+}
+
+/* Variante offline (JS agrega la clase "off") */
+.net-pill.off{
+    background: rgba(255, 107, 107, 0.14);
+    border-color: rgba(255, 107, 107, 0.45);
+}
+.net-pill.off .net-dot{
+    background: var(--danger);
+    box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.25);
+}
+
+/* Banner rojo "sin conexión" (pegado debajo del header) */
+.offline-banner{
+    position: sticky;
+    top: var(--header-height);
+    z-index: 9;
+    padding: 10px clamp(16px, 4vw, 40px);
+    background: var(--offline);
+    color: #fff;
+    font-size: 14px;
+    text-align: center;
+}
+
+/* ==========================================================
+   4. DISTRIBUCIÓN
+   ========================================================== */
+
+/* Grid principal: 1 columna en móvil, 2 en desktop (ver media query) */
+.layout{
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px clamp(12px, 3vw, 32px) 40px;
+}
+
+/* Tarjeta reutilizable (formulario y lista) */
+.card{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px;
+}
+.card h2{ margin-bottom: 14px; font-size: 20px; }
+
+/* ==========================================================
+   5. FORMULARIO Y BOTONES
+   ========================================================== */
+
+/* Mensaje dentro del formulario */
+.form-msg{
+    min-height: 20px;   /* reserva espacio para no saltar al mostrarse */
+    margin: 10px 0 4px;
+    font-size: 14px;
+    color: var(--danger); /* por defecto = error */
+}
+.form-msg.ok{ color: #7ff0bd; }
+.form-msg.info{ color: var(--info); }
+
+/* Botón base */
+.btn{
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+    padding: 13px 16px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 700;
+    font-family: inherit;
+    text-align: center;
+    cursor: pointer;
+    transition: background .15s, transform .1s;
+}
+.btn:hover:not(:disabled){ background: rgba(255, 255, 255, 0.08); }
+.btn:active:not(:disabled){ transform: scale(0.98); }
+.btn:disabled{ opacity: .45; cursor: not-allowed; }
+
+/* Variantes de color */
+.btn-primary{ background: var(--purple); border-color: var(--purple); color: #fff; }
+.btn-primary:hover:not(:disabled){ background: var(--purple-dark); }
+.btn-danger{ color: var(--danger); border-color: rgba(255, 107, 107, 0.6); }
+.btn-danger-solid{ background: var(--danger); border-color: var(--danger); color: #3a0d0d; }
+.btn-danger-solid:hover:not(:disabled){ background: #ff8585; }
+
+/* Fila de 2 botones (Actualizar / Eliminar) */
+.btn-row{ display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* Botón pequeño (recargar, sync, install) */
+.btn-small{ width: auto; margin-top: 0; padding: 10px 16px; }
+
+/* Variantes de color específicas */
+.btn-install{ border-color: var(--purple); color: #d9ceff; }
+.btn-sync{ border-color: var(--orange); color: #ffd9a8; background: rgba(233, 137, 44, 0.14); }
+
+/* Estado "en proceso": agrega spinner CSS con ::after */
+.btn.loading:disabled{ opacity: .85; cursor: progress; }
+.btn.loading::after{
+    content: "";
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    margin-left: 8px;
+    border: 2px solid currentColor;   /* hereda color del texto */
+    border-right-color: transparent;  /* lado transparente → parece girar */
+    border-radius: 50%;
+    vertical-align: -2px;
+    animation: spin .7s linear infinite;
+}
+@keyframes spin{ to{ transform: rotate(360deg); } }
+
+/* ==========================================================
+   6. LISTA, BUSCADOR, TABLA Y PAGINACIÓN
+   ========================================================== */
+
+.list-head{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+.list-head h2{ margin-bottom: 2px; }
+
+/* Buscador (ahora SIN botón al lado) */
+.search{ display: flex; gap: 10px; margin-bottom: 14px; }
+.search input{ flex: 1; min-width: 0; padding: 10px 16px; }
+
+/* Scroll horizontal en móviles */
+.table-wrap{ overflow-x: auto; }
+
+/* Tabla con "espacio" entre filas (border-spacing) */
+table{ width: 100%; border-collapse: separate; border-spacing: 0 8px; }
+th{ text-align: left; font-size: 13px; color: var(--muted); font-weight: 600; padding: 0 12px 2px; }
+
+/* Filas clicables */
+tbody tr{
+    background: var(--card-2);
+    cursor: pointer;
+    transition: background .15s;
+}
+tbody tr:hover{ background: var(--card-hover); }
+
+/* Fila seleccionada: borde morado interno */
+tbody tr.selected{
+    background: var(--card-hover);
+    box-shadow: inset 0 0 0 2px var(--purple);
+}
+
+/* Fila con cambios pendientes: barra naranja a la izquierda */
+tbody tr.is-pending{ box-shadow: inset 4px 0 0 var(--orange); }
+tbody tr.is-pending.selected{
+    box-shadow: inset 4px 0 0 var(--orange), inset 0 0 0 2px var(--purple);
+}
+
+td{ padding: 12px; font-size: 14px; vertical-align: middle; }
+
+/* Redondeo solo en extremos */
+td:first-child{ border-radius: 12px 0 0 12px; }
+td:last-child{ border-radius: 0 12px 12px 0; }
+
+/* Columna Id: puede ser un UUID largo → truncamos con ellipsis */
+td.id{
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 11px;
+    color: var(--muted);
+}
+td.name{ font-weight: 700; }
+
+/* Fila "placeholder" (vacío/cargando): no clicable */
+tbody tr.placeholder{ cursor: default; background: transparent; box-shadow: none; }
+tbody tr.placeholder:hover{ background: transparent; }
+.empty{ text-align: center; color: var(--muted); padding: 24px 12px; }
+
+/* Badge de rol (USER verde / ADMIN naranja) */
+.badge{
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+    background: var(--user);
+}
+.badge.admin{ background: var(--orange); }
+
+/* Etiqueta "Pendiente" junto al nombre */
+.pending-tag{
+    display: inline-block;
+    margin-left: 8px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    border: 1px solid var(--orange);
+    background: rgba(233, 137, 44, 0.16);
+    color: #ffd9a8;
+    font-size: 11px;
+    font-weight: 700;
+    vertical-align: middle;
+}
+
+/* Paginación */
+.pager{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 12px;
+    font-size: 14px;
+}
+
+/* ==========================================================
+   7. MENSAJES EMERGENTES (TOASTS)
+   ========================================================== */
+
+/* Stack flotante abajo-derecha. pointer-events:none para no bloquear clics fuera */
+.toast-stack{
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: min(380px, calc(100% - 32px));
+    pointer-events: none;
+}
+
+/* Toast base: entra con transición (opacity + translateY) */
+.toast{
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 14px;
+    background: #0b2c21;
+    color: var(--text);
+    border: 1px solid var(--line);
+    border-left: 5px solid var(--info);
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    font-size: 14px;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity .25s, transform .25s;
+    pointer-events: auto; /* este sí recibe clics (botón cerrar) */
+}
+.toast.show{ opacity: 1; transform: translateY(0); }
+
+/* Ícono circular */
+.toast-icon{
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    font-size: 14px;
+    font-weight: 800;
+    color: #0b2c21;
+    background: var(--info);
+}
+.toast-text{ flex: 1; padding-top: 2px; }
+.toast-close{
+    flex: none;
+    border: 0;
+    background: transparent;
+    color: var(--muted);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+}
+.toast-close:hover{ color: var(--text); }
+
+/* Variantes de color por tipo */
+.toast-success{ border-left-color: var(--success); }
+.toast-success .toast-icon{ background: var(--success); }
+.toast-error{ border-left-color: var(--danger); }
+.toast-error .toast-icon{ background: var(--danger); }
+.toast-warning{ border-left-color: var(--warning); }
+.toast-warning .toast-icon{ background: var(--warning); }
+
+/* ==========================================================
+   8. CUADRO DE CONFIRMACIÓN
+   ========================================================== */
+
+.dialog{
+    width: min(420px, calc(100% - 32px));
+    padding: 24px;
+    background: var(--card);
+    color: var(--text);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+/* Capa detrás del <dialog> modal */
+.dialog::backdrop{ background: rgba(4, 20, 14, 0.65); backdrop-filter: blur(2px); }
+.dialog h3{ font-size: 20px; margin-bottom: 8px; }
+.dialog p{ margin: 0 0 18px; color: var(--muted); }
+
+.dialog-actions{ display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.dialog-actions .btn{ margin-top: 0; }
+
+/* ==========================================================
+   9. RESPONSIVO
+   ========================================================== */
+
+/* Escritorio: dos columnas, formulario sticky */
+@media (min-width: 900px){
+    .layout{ grid-template-columns: 340px 1fr; align-items: start; }
+    .form-card{ position: sticky; top: 96px; }
+}
+
+/* Móvil: tabla convertida en tarjetas apiladas */
+@media (max-width: 640px){
+    thead{ display: none; }
+    table, tbody, tr, td{ display: block; width: 100%; }
+    tbody tr{
+        position: relative;
+        margin-bottom: 10px;
+        padding: 14px 90px 14px 14px; /* espacio para el badge de rol */
+        border-radius: 14px;
+    }
+    tbody tr.placeholder{ padding: 0; }
+    td{ padding: 0; }
+    td:first-child, td:last-child{ border-radius: 0; }
+    td.name{ font-size: 16px; }
+    .pending-tag{ display: table; margin: 4px 0 0; }
+    td.user{ color: var(--muted); }
+    td.id{ max-width: none; margin-top: 4px; }
+    td.rol{ position: absolute; right: 14px; top: 14px; width: auto; }
+    .search{ flex-direction: column; }
+    .search .btn{ width: 100%; }
+    .toast-stack{ right: 16px; left: 16px; bottom: 16px; width: auto; }
+}
+
+/* Móviles muy estrechos: solo el punto de conexión */
+@media (max-width: 480px){
+    #netText{ display: none; }
+    .net-pill{ padding: 8px; }
+}
+
+/* Respeta la preferencia de reducir animaciones */
+@media (prefers-reduced-motion: reduce){
+    *{ transition: none !important; }
+}
+
+/* Botón primario deshabilitado coherente con el tema */
+.btn-primary:disabled{ background: var(--card-2); border-color: var(--line); color: var(--muted); }

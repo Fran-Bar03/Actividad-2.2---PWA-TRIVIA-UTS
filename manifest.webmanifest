@@ -1,0 +1,20 @@
+{
+    "name": "Gestión de usuarios",
+    "short_name": "Usuarios",
+    "description": "PWA para administrar usuarios con funcionamiento sin conexión",
+    "lang": "es",
+    "start_url": "./index.html",
+    "scope": "./",
+    "display": "standalone",
+    "orientation": "any",
+    "background_color": "#0a2f23",
+    "theme_color": "#0d3b2c",
+    "icons": [
+        {
+            "src": "icono2.png",
+            "sizes": "144x144 192x192 512x512",
+            "type": "image/png",
+            "purpose": "any"
+        }
+    ]
+}
