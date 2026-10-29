@@ -8,7 +8,7 @@ const API_BASE_URL = "https://userapi-m8ef.onrender.com";
 const API_AUTH_PATH = "/api/Auth";
 const AUTH_URL = `${API_BASE_URL}${API_AUTH_PATH}`;
 
-// Endpoints. Se ELIMINÓ userById porque ya no se busca por id contra la API.
+// Endpoints.
 const ENDPOINTS = Object.freeze({
     users: () => `${AUTH_URL}/Get/Users`,
     createUser: () => `${AUTH_URL}/Create/User`,
