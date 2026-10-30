@@ -92,7 +92,19 @@ const MESSAGES = Object.freeze({
     queued: Object.freeze({
         [OPS.CREATE]: name => `Usuario «${name}» guardado. Se agregará al servidor cuando haya conexión.`,
         [OPS.UPDATE]: name => `Cambios de «${name}» guardados. Se enviarán al servidor cuando haya conexión.`,
-        [OPS.DELETE]: name => `«${name}» eliminado. Se borrará del servidor cuando haya conexión.`
+        [OPS.DELETE]: name => `«${name}» marcado para eliminar. Se borrará del servidor cuando haya conexión.`
+    }),
+
+    // Etiquetas de la tabla según la operación pendiente
+    pendingTag: Object.freeze({
+        [OPS.CREATE]: "Pendiente",
+        [OPS.UPDATE]: "Pendiente",
+        [OPS.DELETE]: "Eliminación pendiente"
+    }),
+    pendingTitle: Object.freeze({
+        [OPS.CREATE]: "Se agregará al servidor cuando haya conexión",
+        [OPS.UPDATE]: "Se enviará al servidor cuando haya conexión",
+        [OPS.DELETE]: "Se eliminará del servidor cuando haya conexión. Ya no se puede modificar"
     }),
 
     // Sincronización
@@ -302,7 +314,7 @@ const Queue = {
 
     // Combina server + pendientes (lo que ve el usuario)
     apply(serverUsers) {
-        let list = serverUsers.map(user => ({ ...user }));
+        const list = serverUsers.map(user => ({ ...user }));
 
         for (const op of this.items) {
             const data = op.payload ?? {};
@@ -321,7 +333,9 @@ const Queue = {
                     user.pending = user.pending ?? OPS.UPDATE;
                 }
             } else if (op.type === OPS.DELETE) {
-                list = list.filter(item => item.id !== op.userId);
+                // El usuario NO se quita de la tabla: se marca como "eliminación pendiente"
+                const user = list.find(item => item.id === op.userId);
+                if (user) user.pending = OPS.DELETE;
             }
         }
         return list;
@@ -541,17 +555,21 @@ const UI = {
     // HTML de una fila de la tabla (TODO dato del usuario se escapa)
     rowTemplate(user) {
         const badge = ROLE_BADGES[user.rol] ?? ROLE_BADGES[ROLES.PLAYER];
+        const isDeleting = user.pending === OPS.DELETE;
         const classes = [
             user.id === state.selectedId ? "selected" : "",
-            user.pending ? "is-pending" : ""
+            user.pending ? "is-pending" : "",
+            isDeleting ? "is-deleting" : ""
         ].join(" ").trim();
         const id = Utils.escapeHtml(user.id);
         const idText = user.pending === OPS.CREATE ? "Se asignará al sincronizar" : id;
         const tag = user.pending
-            ? `<span class="pending-tag" title="Se enviará al servidor cuando haya conexión">Pendiente</span>`
+            ? `<span class="pending-tag ${isDeleting ? "delete" : ""}" title="${MESSAGES.pendingTitle[user.pending]}">${MESSAGES.pendingTag[user.pending]}</span>`
             : "";
+        // Con eliminación pendiente la fila no lleva data-id ni tabindex: no se puede seleccionar ni modificar
+        const rowAttrs = isDeleting ? `aria-disabled="true"` : `tabindex="0" data-id="${id}"`;
         return `
-            <tr tabindex="0" data-id="${id}" class="${classes}">
+            <tr ${rowAttrs} class="${classes}">
                 <td class="id" title="${id}">${idText}</td>
                 <td class="name">${Utils.escapeHtml(user.name)}${tag}</td>
                 <td class="user">${Utils.escapeHtml(user.userName)}</td>
@@ -633,7 +651,8 @@ const Controller = {
     // Selecciona un usuario: lo carga en el formulario
     selectUser(id) {
         const user = this.viewUsers().find(item => item.id === id);
-        if (!user) return;
+        // Un usuario con eliminación pendiente ya no se puede seleccionar
+        if (!user || user.pending === OPS.DELETE) return;
 
         state.selectedId = user.id;
         UI.setFormValues(user);
@@ -831,7 +850,7 @@ const Controller = {
         el.btnPrev.addEventListener("click", () => this.changePage(-1));
         el.btnNext.addEventListener("click", () => this.changePage(1));
 
-        // Click en fila → seleccionar
+        // Click en fila → seleccionar (las filas con eliminación pendiente no tienen data-id)
         el.tbody.addEventListener("click", e => {
             const row = e.target.closest("tr[data-id]");
             if (row) this.selectUser(row.dataset.id);
